@@ -1,0 +1,72 @@
+▶ authentication
+  ✔ protected API without a session returns 401
+  ✔ registration validates fields
+  ✔ registration creates a student and signs them in
+  ✔ duplicate email is rejected with 409
+  ✔ wrong password is rejected without revealing which part was wrong
+  ✔ demo mentor and admin can sign in
+✔ authentication
+▶ role-based access
+  ✔ a student cannot reach mentor or admin APIs
+  ✔ a mentor can review but cannot administer
+✔ role-based access
+▶ student journey
+  ✔ choosing a goal generates a roadmap in the same transaction
+  ✔ PDF resume upload is parsed into MongoDB and skills are detected
+  ✔ a non-PDF file pretending to be a PDF is rejected
+  ✔ importing resume skills is atomic and creates claims (not verified levels)
+  ✔ regenerating the roadmap after import moves skills to Build/Prove
+  ✔ evidence validation: a link or a project is required
+  ✔ mentor verification raises the verified level through the trigger
+  ✔ the verification is in the audit log with the mentor as actor
+  ✔ gap analysis, graph and job matching respond for the new student
+  ✔ SQL injection in search input is treated as plain text
+  ✔ job search filters and paginates
+✔ student journey
+▶ admin
+  ✔ job ingestion: unknown-only skills are rejected, a valid posting is normalised
+  ✔ market refresh runs the stored procedure
+  ✔ a prerequisite that would create a cycle is rejected (422)
+  ✔ an admin cannot remove their own admin role
+  ✔ analytics combines PostgreSQL and MongoDB aggregates
+  ✔ deactivating a user ends their access immediately
+✔ admin
+▶ constraints and domains
+  ✔ proficiency domain rejects level 6
+  ✔ email domain rejects a malformed address
+  ✔ password_hash must be a bcrypt hash (no plain text)
+  ✔ email is unique regardless of case (citext)
+  ✔ project completion date cannot precede start date
+  ✔ evidence needs a link or a project
+  ✔ FK RESTRICT: a skill used by roles cannot be deleted
+  ✔ ON DELETE CASCADE: deleting a user removes their dependent rows
+✔ constraints and domains
+▶ triggers
+  ✔ a new active goal retires the previous one (one active goal per user)
+  ✔ verifying evidence raises verified_level (and the claim never sits below it)
+  ✔ a student cannot review evidence, and a mentor cannot review their own
+  ✔ evidence cannot reference another student's project
+  ✔ the prerequisite graph rejects a cycle
+  ✔ audit trigger records the actor set with SET LOCAL
+✔ triggers
+▶ functions and procedure
+  ✔ compute_skill_priorities returns only gaps, with every factor and the priority in [0,1]
+  ✔ changing a scoring weight changes the ranking
+  ✔ generate_roadmap versions roadmaps and orders prerequisites first
+  ✔ generate_roadmap without a goal raises P0002
+  ✔ completing every item rolls the roadmap up to completed
+  ✔ match_jobs returns scores in [0,1], best first
+  ✔ refresh_market_signals runs as the application role (SECURITY DEFINER)
+✔ functions and procedure
+▶ indexes and search
+  ✔ full-text search finds postings through the GIN index
+  ✔ k-NN over embeddings uses the HNSW index
+✔ indexes and search
+▶ least-privilege application role
+  ✔ cannot create or drop tables
+  ✔ cannot rewrite or delete the audit trail
+✔ least-privilege application role
+ℹ tests 50
+ℹ suites 9
+ℹ pass 50
+ℹ fail 0
