@@ -1,0 +1,31 @@
+digraph A {
+  graph [rankdir=TB, fontname="DejaVu Sans", nodesep=0.5, ranksep=0.55, pad=0.3, newrank=true];
+  node  [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, fillcolor="#ffffff", color="#8a94a3", margin="0.18,0.08"];
+  edge  [fontname="DejaVu Sans", fontsize=8.5, color="#6b7280", fontcolor="#4b5563"];
+
+  subgraph cluster_client { label="Browser"; style="rounded,dashed"; color="#b8c0cc"; fontsize=11;
+    ui [label="Next.js pages (React)\nstudent · mentor · admin views", fillcolor="#e3ebf7"]; }
+
+  subgraph cluster_server { label="Next.js server (Node.js)"; style="rounded,dashed"; color="#b8c0cc"; fontsize=11;
+    mw  [label="middleware.ts\nJWT cookie check · role gates", fillcolor="#f4ecd0"];
+    api [label="Route handlers /api/*\nzod validation · requireUser(role)\nerror → HTTP mapping", fillcolor="#f4ecd0"];
+    lib [label="lib/\nresume-parser · jobs ingest · embeddings\ngraph (Neo4j + CTE fallback) · auth (bcrypt, jose)", fillcolor="#f4ecd0"];
+    emb [label="Embedding model\nall-MiniLM-L6-v2, 384-d\n(local, Transformers.js)", fillcolor="#ece2f2"];
+  }
+
+  subgraph cluster_data { label="Data tier (docker compose)"; style="rounded,dashed"; color="#b8c0cc"; fontsize=11;
+    pg  [label="PostgreSQL 16 + pgvector\n20 tables · views · functions · procedure · triggers\nGIN (FTS, trigram) · HNSW (cosine)\nrole skillgraph_app: DML only", fillcolor="#dbe6f4"];
+    mg  [label="MongoDB 7\nresumes_raw · job_sources · activity_log\n$jsonSchema validators · TTL · text index", fillcolor="#e1f1e6"];
+    neo [label="Neo4j 5\n(:Skill)-[:PREREQ_OF]->(:Skill)\n(:Role)-[:REQUIRES]->(:Skill), evidence paths", fillcolor="#f6ead9"];
+  }
+
+  ui  -> mw  [label="HTTPS, httpOnly cookie"];
+  mw  -> api;
+  api -> lib;
+  lib -> emb [label="embed text"];
+  api -> pg  [label="parameterised SQL\nBEGIN … COMMIT\nSET LOCAL app.user_id"];
+  lib -> mg  [label="raw documents\naggregations"];
+  lib -> neo [label="Cypher traversal"];
+  pg  -> neo [label="graph:sync projection", style=dashed];
+  pg  -> mg  [label="mongo_doc_id /\nmongo_source_id", style=dotted, dir=back];
+}

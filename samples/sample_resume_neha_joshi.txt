@@ -1,0 +1,30 @@
+NEHA JOSHI
+Pune | neha.joshi@example.com | github.com/neha-demo
+
+OBJECTIVE
+Third-year IT student aiming for a backend developer role in fintech.
+
+EDUCATION
+B.E. in Information Technology, Pune Institute of Technology - 2027 (CGPA 8.9)
+
+INTERNSHIPS
+Backend Intern - Orbit Fintech (Jun 2026 - Aug 2026)
+- Built REST endpoints in Node.js (Express) backed by PostgreSQL
+- Wrote unit tests with Jest and added JWT authentication
+- Containerised the service with Docker for the staging environment
+
+PROJECTS
+Expense Splitter API | Node.js, PostgreSQL, Redis
+- REST API with JWT auth; cached balances in Redis; 92% test coverage with Jest
+Library Management System | Java, MySQL
+- Desktop app with normalised schema design and stored procedures
+
+TECHNICAL SKILLS
+Languages: JavaScript, TypeScript, Java, SQL
+Backend: Node.js, Express, REST API, GraphQL basics
+Databases: PostgreSQL, MySQL, Redis, MongoDB
+Tools: Git, Docker, Postman, Swagger, Kafka
+Other: Data Structures & Algorithms, OOP, system design basics
+
+CERTIFICATIONS
+Node.js Application Developer (2026)
