@@ -51,13 +51,17 @@ export async function extractText(buf: Buffer, mime: string): Promise<string> {
 }
 
 const HEADINGS: Array<[string, RegExp]> = [
-  ['summary', /^(professional\s+)?(summary|objective|profile|about me)\b/i],
-  ['education', /^(education|academic(s| background| qualifications)?|qualifications)\b/i],
-  ['experience', /^(work\s+|professional\s+)?(experience|employment|internships?|work history)\b/i],
-  ['projects', /^(academic\s+|personal\s+|key\s+)?projects?\b/i],
-  ['skills', /^(technical\s+|core\s+|key\s+)?(skills|technologies|tech stack|tools|competencies)\b/i],
+  ['summary', /^(professional\s*)?(summary|objective|profile|about\s*me)\b/i],
+  ['education', /^(education|academic(s|\s*background|\s*qualifications)?|qualifications)\b/i],
+  ['experience', /^(work\s*|professional\s*)?(experience|employment|internships?|work\s*history)\b/i],
+  ['projects', /^(academic\s*|personal\s*|key\s*)?projects?\b/i],
+  ['skills', /^(technical\s*|core\s*|key\s*)?(skills|technologies|tech\s*stack|tools|competencies)\b/i],
   ['certifications', /^(certifications?|certificates|courses|achievements|awards)\b/i],
 ];
+
+// Designed resumes often letter-space their headings ("S U M M A RY"): collapse those before matching
+const LETTER_SPACED = /^(?:[A-Za-z&]{1,3} ){2,}[A-Za-z&]{1,3}$/;
+const unspace = (s: string) => (LETTER_SPACED.test(s) ? s.replace(/ /g, '') : s);
 
 export function splitSections(text: string): Record<string, string[]> {
   const sections: Record<string, string[]> = { header: [] };
@@ -65,7 +69,7 @@ export function splitSections(text: string): Record<string, string[]> {
   for (const raw of text.split(/\r?\n/)) {
     const line = raw.replace(/\s+/g, ' ').trim();
     if (!line) continue;
-    const bare = line.replace(/[:\-–|•]+$/g, '').trim();
+    const bare = unspace(line.replace(/[:\-–|•]+$/g, '').trim());
     const heading = bare.length <= 40 ? HEADINGS.find(([, re]) => re.test(bare)) : undefined;
     if (heading) {
       current = heading[0];
