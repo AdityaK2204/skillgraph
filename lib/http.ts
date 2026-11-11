@@ -39,7 +39,11 @@ export function toResponse(err: unknown) {
     return NextResponse.json({ error: message, constraint: pg.constraint ?? null }, { status });
   }
   const msg = (err as Error)?.message ?? 'Unexpected error';
-  if (/ECONNREFUSED|Server selection timed out|getaddrinfo/i.test(msg)) {
+  // a refused connection can arrive as an AggregateError whose message is empty but whose code is set
+  const netCodes = ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT', 'ECONNRESET'];
+  const nested = (err as { errors?: Array<{ code?: string }> })?.errors ?? [];
+  if (netCodes.includes(pg?.code ?? '') || nested.some((e) => netCodes.includes(e?.code ?? '')) ||
+      /ECONNREFUSED|Server selection timed out|getaddrinfo/i.test(msg)) {
     return NextResponse.json({ error: 'A database is not reachable. Check that docker compose is running.' }, { status: 503 });
   }
   console.error(err);
